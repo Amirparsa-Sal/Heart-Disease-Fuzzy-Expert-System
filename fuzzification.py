@@ -134,6 +134,10 @@ class FuzzyParameter:
             result[set_name] = set.get_value(x)
         return result
     
+    def get_value_in_set(self, x: float, set_name: str) -> float:
+        '''Returns the value of the parameter at x in the fuzzyset with the given name.'''
+        return self.sets[set_name].get_value(x)
+    
     def __str__(self) -> str:
         return f'{self.name}: sets: {len(self.sets)}'
 
@@ -264,6 +268,16 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
 
     return [chest_pain_param, blood_pressure_param, cholesterol_param, blood_sugar_param,
            ecg_param, heartrate_param, exercise_param, oldpeak_param, thallium_param, age_param]
+
+def init_output_fuzzy_sets():
+    # Define output fuzzysets
+    output_param = FuzzyParameter(name='output', range=(0, 1))
+    output_param.create_set('sick1', [(0, 1), (0.25, 1), (1, 0)])
+    output_param.create_set('sick2', [(0, 0), (1, 1), (2,0)])
+    output_param.create_set('sick3', [(1, 0), (2, 1), (3,0)])
+    output_param.create_set('sick4', [(2, 0), (3, 1), (4,0)])
+    output_param.create_set('healthy', [(3, 0), (3.75, 1), (4, 1)])
+    return output_param
 
 if __name__ == '__main__':
     params = init_fuzzy_parameters()
