@@ -70,3 +70,22 @@ class FuzzySet:
         if range2[0] < range1[1] < range2[1] or range1[0] < range2[1] < range1[1]:
             return True
         return False
+
+# Define age fuzzysets
+AGE_RANGE = (0, 100)
+
+age_young = FuzzySet(name='age_young', range=AGE_RANGE)
+age_young.add(ConstantValue(start_x=0, end_x=29, value=1))
+age_young.add(Line((29, 1), (38, 0)))
+
+age_mild = FuzzySet(name='age_mild', range=AGE_RANGE)
+age_mild.add(Line((33, 0), (38, 1)))
+age_mild.add(Line((38, 1), (45, 0)))
+
+age_old = FuzzySet(name='age_old', range=AGE_RANGE)
+age_old.add(Line((40, 0), (48, 1)))
+age_old.add(Line((48, 1), (58, 0)))
+
+
+age_veryold = FuzzySet(name='age_veryold', range=AGE_RANGE)
+age_veryold.add(Line((52, 0), (60, 1)))
