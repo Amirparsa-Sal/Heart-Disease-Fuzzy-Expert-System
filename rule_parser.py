@@ -7,6 +7,7 @@ class RuleParser:
     def __init__(self) -> None:
         pass
 
+    @classmethod
     def parse_rule(self, rule: str) -> Tuple[List, str]:
         '''Given a rule in rules.fcl format, returns the if and then clauses as a tuple.
         output format: tuple(if_clause: list, then_clause: str)
