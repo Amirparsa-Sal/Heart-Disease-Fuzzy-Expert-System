@@ -1,6 +1,5 @@
 from abc import abstractmethod, ABC
-from sqlite3 import paramstyle
-from typing import Tuple
+from typing import Tuple, List
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -114,59 +113,65 @@ class FuzzyParameter:
             result[set_name] = set.get_value(x)
         return result
 
-# Define age fuzzysets
-AGE_RANGE = (0, 100)
+def init_fuzzy_parameters() -> List[FuzzyParameter]:
+    '''Initializes the fuzzy parameters.'''
 
-age_param = FuzzyParameter(name='age', range=AGE_RANGE)
-age_param.create_set('young', [(AGE_RANGE[0], 1), (29, 1), (38, 0)])
-age_param.create_set('mild', [(33, 0), (38, 1), (45, 0)])
-age_param.create_set('old', [(40, 0), (48, 1), (58, 0)])
-age_param.create_set('veryold', [(52, 0), (60, 1), (AGE_RANGE[1], 1)])
+    # Define age fuzzysets
+    AGE_RANGE = (0, 100)
 
-# Define Blood pressure fuzzysets
-BP_RANGE = (0, 350)
+    age_param = FuzzyParameter(name='age', range=AGE_RANGE)
+    age_param.create_set('young', [(AGE_RANGE[0], 1), (29, 1), (38, 0)])
+    age_param.create_set('mild', [(33, 0), (38, 1), (45, 0)])
+    age_param.create_set('old', [(40, 0), (48, 1), (58, 0)])
+    age_param.create_set('veryold', [(52, 0), (60, 1), (AGE_RANGE[1], 1)])
 
-blood_pressure_param = FuzzyParameter(name='bloodPressure', range=BP_RANGE)
-blood_pressure_param.create_set('low', [(BP_RANGE[0], 1), (111, 1), (134, 0)])
-blood_pressure_param.create_set('medium', [(127, 0), (139, 1), (153, 0)])
-blood_pressure_param.create_set('high', [(153, 0), (157, 1), (172, 0)])
-blood_pressure_param.create_set('veryhigh', [(154, 0), (171, 1), (BP_RANGE[1], 1)])
+    # Define Blood pressure fuzzysets
+    BP_RANGE = (0, 350)
 
-# Define Blood sugar fuzzysets
-BS_RANGE = (0, 200)
+    blood_pressure_param = FuzzyParameter(name='bloodPressure', range=BP_RANGE)
+    blood_pressure_param.create_set('low', [(BP_RANGE[0], 1), (111, 1), (134, 0)])
+    blood_pressure_param.create_set('medium', [(127, 0), (139, 1), (153, 0)])
+    blood_pressure_param.create_set('high', [(153, 0), (157, 1), (172, 0)])
+    blood_pressure_param.create_set('veryhigh', [(154, 0), (171, 1), (BP_RANGE[1], 1)])
 
-blood_sugar_param = FuzzyParameter(name='bloodSugar', range=BS_RANGE)
-blood_sugar_param.create_set('low', [(105, 0), (120, 1), (BS_RANGE[1], 1)])
+    # Define Blood sugar fuzzysets
+    BS_RANGE = (0, 200)
 
-# Define cholesterol fuzzysets
-CH_RANGE = (0, 600)
+    blood_sugar_param = FuzzyParameter(name='bloodSugar', range=BS_RANGE)
+    blood_sugar_param.create_set('low', [(105, 0), (120, 1), (BS_RANGE[1], 1)])
 
-cholesterol_param = FuzzyParameter(name='cholesterol', range=CH_RANGE)
-cholesterol_param.create_set('low', [(CH_RANGE[0], 1), (151, 1), (197, 0)])
-cholesterol_param.create_set('medium', [(188, 0), (215, 1), (250, 0)])
-cholesterol_param.create_set('high', [(217, 0), (263, 1), (307, 0)])
-cholesterol_param.create_set('veryhigh', [(281, 0), (347, 1), (CH_RANGE[1], 1)])
+    # Define cholesterol fuzzysets
+    CH_RANGE = (0, 600)
 
-# Define heartrate fuzzysets
-HR_RANGE = (0, 600)
+    cholesterol_param = FuzzyParameter(name='cholesterol', range=CH_RANGE)
+    cholesterol_param.create_set('low', [(CH_RANGE[0], 1), (151, 1), (197, 0)])
+    cholesterol_param.create_set('medium', [(188, 0), (215, 1), (250, 0)])
+    cholesterol_param.create_set('high', [(217, 0), (263, 1), (307, 0)])
+    cholesterol_param.create_set('veryhigh', [(281, 0), (347, 1), (CH_RANGE[1], 1)])
 
-heartrate_param = FuzzyParameter(name='heartRate', range=HR_RANGE)
-heartrate_param.create_set('low', [(HR_RANGE[0], 1), (100, 1), (141, 0)])
-heartrate_param.create_set('medium', [(111, 0), (152, 1), (194, 0)])
-heartrate_param.create_set('high', [(152, 0), (210, 1), (HR_RANGE[1], 1)])
+    # Define heartrate fuzzysets
+    HR_RANGE = (0, 600)
 
-# Define ecg fuzzysets
-ECG_RANGE = (-0.5, 2.5)
+    heartrate_param = FuzzyParameter(name='heartRate', range=HR_RANGE)
+    heartrate_param.create_set('low', [(HR_RANGE[0], 1), (100, 1), (141, 0)])
+    heartrate_param.create_set('medium', [(111, 0), (152, 1), (194, 0)])
+    heartrate_param.create_set('high', [(152, 0), (210, 1), (HR_RANGE[1], 1)])
 
-ecg_param = FuzzyParameter(name='ECG', range=ECG_RANGE)
-ecg_param.create_set('normal', [(ECG_RANGE[0], 1), (0, 1), (0.4, 0)])
-ecg_param.create_set('abnormal', [(0.2, 0), (1, 1), (1.8, 0)])
-ecg_param.create_set('hypertrophy', [(1.4, 0), (1.9, 1), (ECG_RANGE[1], 1)])
+    # Define ecg fuzzysets
+    ECG_RANGE = (-0.5, 2.5)
 
-# Define old peak fuzzysets
-OP_RANGE = (0, 10)
+    ecg_param = FuzzyParameter(name='ECG', range=ECG_RANGE)
+    ecg_param.create_set('normal', [(ECG_RANGE[0], 1), (0, 1), (0.4, 0)])
+    ecg_param.create_set('abnormal', [(0.2, 0), (1, 1), (1.8, 0)])
+    ecg_param.create_set('hypertrophy', [(1.4, 0), (1.9, 1), (ECG_RANGE[1], 1)])
 
-oldpeak_param = FuzzyParameter(name='oldPeak', range=OP_RANGE)
-oldpeak_param.create_set('low', [(OP_RANGE[0], 1), (1, 1), (2, 0)])
-oldpeak_param.create_set('risk', [(1.5, 0), (2.8, 1), (4.2, 0)])
-oldpeak_param.create_set('terrible', [(2.5, 0), (4, 1), (OP_RANGE[1], 1)])
+    # Define old peak fuzzysets
+    OP_RANGE = (0, 10)
+
+    oldpeak_param = FuzzyParameter(name='oldPeak', range=OP_RANGE)
+    oldpeak_param.create_set('low', [(OP_RANGE[0], 1), (1, 1), (2, 0)])
+    oldpeak_param.create_set('risk', [(1.5, 0), (2.8, 1), (4.2, 0)])
+    oldpeak_param.create_set('terrible', [(2.5, 0), (4, 1), (OP_RANGE[1], 1)])
+
+    return [age_param, blood_pressure_param, blood_sugar_param, cholesterol_param,
+           heartrate_param, ecg_param, oldpeak_param]
