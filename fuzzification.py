@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+from sqlite3 import paramstyle
 from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,9 +57,9 @@ class ConstantValue:
 
 class FuzzySet:
     '''This is a class to define a fuzzyset.'''
-    def __init__(self, name:str, range: Tuple) -> None:
+    def __init__(self, name:str) -> None:
         self.name = name
-        self.range = range
+        self.parameter = None
         self.sections = []
 
     def add(self, section: FuzzySetSection) -> None:
@@ -71,135 +72,116 @@ class FuzzySet:
     
     def get_value(self, x: float) -> float:
         '''Returns the value of the fuzzyset at x.'''
-        # raise error if x is not in the range
-        if x < self.range[0] or x > self.range[1]:
-            return ValueError('x out of range')
+        # raise error if x is not in the range and x is assigned to a parameter
+        if self.parameter:
+            if x < self.parameter.range[0] or x > self.parameter.range[1]:
+                return ValueError('x out of range')
         # find the section that contains x to get the value
         for section in self.sections:
             if section.range()[0] <= x <= section.range()[1]:
                 return section.get_value(x)
         return 0
-    
-    def plot(self) -> None:
-        '''Plots the fuzzyset.'''
-        x = np.linspace(self.range[0], self.range[1], 100)
-        y = [self.get_value(_x) for _x in x]
-        plt.plot(x, y)
-        plt.show()
 
     def __has_interception(self, range1: Tuple, range2: Tuple) -> bool:
         if range2[0] < range1[1] < range2[1] or range1[0] < range2[1] < range1[1]:
             return True
         return False
 
+class FuzzyParameter:
+    
+    def __init__(self, name: str, range: Tuple):
+        self.name = name
+        self.range = range
+        self.sets = dict()
+    
+    def create_set(self, name: str, points: list) -> None:
+        '''Creates a fuzzyset with the given name and points.'''
+        if name in self.sets:
+            raise ValueError('Set already exists')
+        our_set = FuzzySet(name)
+        for i in range(len(points) - 1):
+            our_set.add(Line((points[i][0], points[i][1]), (points[i+1][0], points[i+1][1])))
+        self.sets[our_set.name] = our_set
+        our_set.parameter = self
+
+    def add_set(self, our_set: FuzzySet) -> None:
+        self.sets[our_set.name] = our_set
+        our_set.parameter = self
+    
+    def plot(self) -> None:
+        x = np.linspace(self.range[0], self.range[1], 1000)
+        for set_name, set in self.sets.items():
+            y = [set.get_value(_x) for _x in x]
+            plt.plot(x, y, label=f'{self.name}_{set_name}')
+        plt.legend(loc='best')
+        plt.title(f'{self.name}')
+        plt.show()
+    
+    def get_value(self, x: float) -> dict:
+        result = dict()
+        for set_name, set in self.sets.items():
+            result[set_name] = set.get_value(x)
+        return result
+
 # Define age fuzzysets
 AGE_RANGE = (0, 100)
 
-age_young = FuzzySet(name='age_young', range=AGE_RANGE)
-age_young.add(ConstantValue(start_x=AGE_RANGE[0], end_x=29, value=1))
-age_young.add(Line((29, 1), (38, 0)))
-
-age_mild = FuzzySet(name='age_mild', range=AGE_RANGE)
-age_mild.add(Line((33, 0), (38, 1)))
-age_mild.add(Line((38, 1), (45, 0)))
-
-
-age_old = FuzzySet(name='age_old', range=AGE_RANGE)
-age_old.add(Line((40, 0), (48, 1)))
-age_old.add(Line((48, 1), (58, 0)))
-
-
-age_veryold = FuzzySet(name='age_veryold', range=AGE_RANGE)
-age_veryold.add(Line((52, 0), (60, 1)))
-age_veryold.add(ConstantValue(start_x=60, end_x=AGE_RANGE[1], value=1))
+age_param = FuzzyParameter(name='age', range=AGE_RANGE)
+age_param.create_set('young', [(AGE_RANGE[0], 1), (29, 1), (38, 0)])
+age_param.create_set('mild', [(33, 0), (38, 1), (45, 0)])
+age_param.create_set('old', [(40, 0), (48, 1), (58, 0)])
+age_param.create_set('veryold', [(52, 0), (60, 1), (AGE_RANGE[1], 1)])
+age_param.plot()
 
 # Define Blood pressure fuzzysets
 BP_RANGE = (0, 350)
 
-blood_pressure_low = FuzzySet(name='bloodPressure_low', range=BP_RANGE)
-blood_pressure_low.add(ConstantValue(start_x=BP_RANGE[0], end_x=111, value=1))
-blood_pressure_low.add(Line((111, 1), (134, 0)))
-
-blood_pressure_medium = FuzzySet(name='bloodPressure_medium', range=BP_RANGE)
-blood_pressure_medium.add(Line((127, 0), (139, 1)))
-blood_pressure_medium.add(Line((139, 1), (153, 0)))
-
-blood_pressure_high = FuzzySet(name='bloodPressure_high', range=BP_RANGE)
-blood_pressure_high.add(Line((153, 0), (157, 1)))
-blood_pressure_high.add(Line((157, 1), (172, 0)))
-
-blood_pressure_veryhigh = FuzzySet(name='bloodPressure_veryhigh', range=BP_RANGE)
-blood_pressure_veryhigh.add(Line((154, 0), (171, 1)))
-blood_pressure_veryhigh.add(ConstantValue(start_x=171, end_x=BP_RANGE[1], value=1))
+blood_pressure_param = FuzzyParameter(name='bloodPressure', range=BP_RANGE)
+blood_pressure_param.create_set('low', [(BP_RANGE[0], 1), (111, 1), (134, 0)])
+blood_pressure_param.create_set('medium', [(127, 0), (139, 1), (153, 0)])
+blood_pressure_param.create_set('high', [(153, 0), (157, 1), (172, 0)])
+blood_pressure_param.create_set('veryhigh', [(154, 0), (171, 1), (BP_RANGE[1], 1)])
+blood_pressure_param.plot()
 
 # Define Blood sugar fuzzysets
 BS_RANGE = (0, 200)
 
-blood_sugar_veryhigh = FuzzySet(name='bloodSugar_veryhigh', range=BS_RANGE)
-blood_sugar_veryhigh.add(Line((105, 0), (120, 1)))
-blood_sugar_veryhigh.add(ConstantValue(start_x=120, end_x=BP_RANGE[1], value=1))
+blood_sugar_param = FuzzyParameter(name='bloodSugar', range=BS_RANGE)
+blood_sugar_param.create_set('low', [(105, 0), (120, 1), (BS_RANGE[1], 1)])
+blood_sugar_param.plot()
 
 # Define cholesterol fuzzysets
 CH_RANGE = (0, 600)
 
-cholesterol_low = FuzzySet(name='cholesterol_low', range=CH_RANGE)
-cholesterol_low.add(ConstantValue(start_x=CH_RANGE[0], end_x=151, value=1))
-cholesterol_low.add(Line((151, 1), (197, 0)))
-
-cholesterol_medium = FuzzySet(name='cholesterol_medium', range=CH_RANGE)
-cholesterol_medium.add(Line((188, 0), (215, 1)))
-cholesterol_medium.add(Line((215, 1), (250, 0)))
-
-cholesterol_high = FuzzySet(name='cholesterol_high', range=CH_RANGE)
-cholesterol_high.add(Line((217, 0), (263, 1)))
-cholesterol_high.add(Line((263, 1), (307, 0)))
-
-cholesterol_veryhigh = FuzzySet(name='cholesterol_veryhigh', range=CH_RANGE)
-cholesterol_veryhigh.add(Line((281, 0), (347, 1)))
-cholesterol_veryhigh.add(ConstantValue(start_x=347, end_x=CH_RANGE[1], value=1))
+cholesterol_param = FuzzyParameter(name='cholesterol', range=CH_RANGE)
+cholesterol_param.create_set('low', [(CH_RANGE[0], 1), (151, 1), (197, 0)])
+cholesterol_param.create_set('medium', [(188, 0), (215, 1), (250, 0)])
+cholesterol_param.create_set('high', [(217, 0), (263, 1), (307, 0)])
+cholesterol_param.create_set('veryhigh', [(281, 0), (347, 1), (CH_RANGE[1], 1)])
+cholesterol_param.plot()
 
 # Define heartrate fuzzysets
 HR_RANGE = (0, 600)
 
-heartrate_low = FuzzySet(name='heartRate_low', range=HR_RANGE)
-heartrate_low.add(ConstantValue(start_x=HR_RANGE[0], end_x=100, value=1))
-heartrate_low.add(Line((100, 1), (141, 0)))
-
-heartrate_medium = FuzzySet(name='heartRate_medium', range=HR_RANGE)
-heartrate_medium.add(Line((111, 0), (152, 1)))
-heartrate_medium.add(Line((152, 1), (194, 0)))
-
-heartrate_high = FuzzySet(name='heartRate_high', range=HR_RANGE)
-heartrate_high.add(Line((152, 0), (210, 1)))
-heartrate_high.add(ConstantValue(start_x=210, end_x=HR_RANGE[1], value=1))
-
+heartrate_param = FuzzyParameter(name='heartRate', range=HR_RANGE)
+heartrate_param.create_set('low', [(HR_RANGE[0], 1), (100, 1), (141, 0)])
+heartrate_param.create_set('medium', [(111, 0), (152, 1), (194, 0)])
+heartrate_param.create_set('high', [(152, 0), (210, 1), (HR_RANGE[1], 1)])
+heartrate_param.plot()
 # Define ecg fuzzysets
 ECG_RANGE = (-0.5, 2.5)
 
-ecg_normal = FuzzySet(name='ECG_normal', range=ECG_RANGE)
-ecg_normal.add(ConstantValue(start_x=ECG_RANGE[0], end_x=0, value=1))
-ecg_normal.add(Line((0, 1), (0.4, 0)))
-
-ecg_abnormal = FuzzySet(name='ECG_abnormal', range=ECG_RANGE)
-ecg_abnormal.add(Line((0.2, 0), (1, 1)))
-ecg_abnormal.add(Line((1, 1), (1.8, 0)))
-
-ecg_hypertrophy = FuzzySet(name='ECG_hypertrophy', range=ECG_RANGE)
-ecg_hypertrophy.add(Line((1.4, 0), (1.9, 1)))
-ecg_hypertrophy.add(ConstantValue(start_x=1.9, end_x=ECG_RANGE[1], value=1))
+ecg_param = FuzzyParameter(name='ECG', range=ECG_RANGE)
+ecg_param.create_set('normal', [(ECG_RANGE[0], 1), (0, 1), (0.4, 0)])
+ecg_param.create_set('abnormal', [(0.2, 0), (1, 1), (1.8, 0)])
+ecg_param.create_set('hypertrophy', [(1.4, 0), (1.9, 1), (ECG_RANGE[1], 1)])
+ecg_param.plot()
 
 # Define old peak fuzzysets
 OP_RANGE = (0, 10)
 
-oldpeak_low = FuzzySet(name='oldPeak_low', range=OP_RANGE)
-oldpeak_low.add(ConstantValue(start_x=OP_RANGE[0], end_x=1, value=1))
-oldpeak_low.add(Line((1, 1), (2, 0)))
-
-oldpeak_risk = FuzzySet(name='oldPeak_risk', range=OP_RANGE)
-oldpeak_risk.add(Line((1.5, 0), (2.8, 1)))
-oldpeak_risk.add(Line((2.8, 1), (4.2, 0)))
-
-oldpeak_terrible = FuzzySet(name='oldPeak_terrible', range=OP_RANGE)
-oldpeak_terrible.add(Line((2.5, 0), (4, 1)))
-oldpeak_terrible.add(ConstantValue(start_x=4, end_x=OP_RANGE[1], value=1))
-
+oldpeak_param = FuzzyParameter(name='oldPeak', range=OP_RANGE)
+oldpeak_param.create_set('low', [(OP_RANGE[0], 1), (1, 1), (2, 0)])
+oldpeak_param.create_set('risk', [(1.5, 0), (2.8, 1), (4.2, 0)])
+oldpeak_param.create_set('terrible', [(2.5, 0), (4, 1), (OP_RANGE[1], 1)])
+oldpeak_param.plot()
