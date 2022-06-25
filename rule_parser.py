@@ -14,7 +14,8 @@ class RuleParser:
         '''
         # split then clause
         splitted_rule = rule.split('THEN')
-        then_clause = splitted_rule[1][:-1].strip()
+        then_clause = splitted_rule[1][:-1].split('IS')
+        then_clause = (then_clause[0].strip(), then_clause[1].strip())
         # split if clause
         if_clause = splitted_rule[0].split('IF')[1].replace('(', '( ').replace(')', ' )').strip()
         if_clause = if_clause.split(' ')

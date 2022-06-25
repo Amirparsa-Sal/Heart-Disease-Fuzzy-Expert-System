@@ -52,10 +52,3 @@ RULE 51: IF (age IS mild) THEN health IS sick_1;
 RULE 52: IF (age IS old) THEN health IS sick_2;
 RULE 53: IF (age IS old) THEN health IS sick_3;
 RULE 54: IF (age IS very_old) THEN health IS sick_4;
-
-
-
-
-
-
-
