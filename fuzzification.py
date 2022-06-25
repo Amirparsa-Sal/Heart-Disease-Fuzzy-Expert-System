@@ -1,5 +1,8 @@
 from abc import abstractmethod, ABC
 from typing import Tuple
+from unittest import result
+import matplotlib.pyplot as plt
+import numpy as np
 
 class FuzzySetSection(ABC):
     
@@ -22,9 +25,10 @@ class Line(FuzzySetSection):
         self.m, self.b = self.find_line_paramaters(self.start_pos[0], self.start_pos[1], self.end_pos[0], self.end_pos[1])
 
     def find_line_paramaters(self, x1: int, y1: int, x2: int, y2: int) -> Tuple:
-        m = (y2 - y1) / (x2 - x1)
-        b = y1 - m * x1
-        return m, b
+        weights = np.array([[x1, 1], [x2, 1]])
+        out = np.array([y1, y2])
+        result = np.linalg.solve(weights, out)
+        return result[0], result[1]
 
     def get_value(self, x: float) -> Tuple:
         return self.m * x + self.b
@@ -70,17 +74,24 @@ class FuzzySet:
         if range2[0] < range1[1] < range2[1] or range1[0] < range2[1] < range1[1]:
             return True
         return False
+    
+    def plot(self) -> None:
+        x = np.linspace(self.range[0], self.range[1], 100)
+        y = [self.get_value(_x) for _x in x]
+        plt.plot(x, y)
+        plt.show()
 
 # Define age fuzzysets
 AGE_RANGE = (0, 100)
 
 age_young = FuzzySet(name='age_young', range=AGE_RANGE)
-age_young.add(ConstantValue(start_x=0, end_x=29, value=1))
+age_young.add(ConstantValue(start_x=AGE_RANGE[0], end_x=29, value=1))
 age_young.add(Line((29, 1), (38, 0)))
 
 age_mild = FuzzySet(name='age_mild', range=AGE_RANGE)
 age_mild.add(Line((33, 0), (38, 1)))
 age_mild.add(Line((38, 1), (45, 0)))
+
 
 age_old = FuzzySet(name='age_old', range=AGE_RANGE)
 age_old.add(Line((40, 0), (48, 1)))
@@ -89,3 +100,4 @@ age_old.add(Line((48, 1), (58, 0)))
 
 age_veryold = FuzzySet(name='age_veryold', range=AGE_RANGE)
 age_veryold.add(Line((52, 0), (60, 1)))
+age_veryold.add(ConstantValue(start_x=60, end_x=AGE_RANGE[1], value=1))
