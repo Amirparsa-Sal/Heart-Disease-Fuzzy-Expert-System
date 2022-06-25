@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class FuzzySetSection(ABC):
-    '''This is a class to define a section in a fuzzyset. this section can be a line or a constant value.'''
+    '''This is a class to define a section in a fuzzyset. this section can be a line or anything.'''
 
     @abstractmethod
     def range(self) -> Tuple:
@@ -75,14 +75,15 @@ class FuzzySet:
         return False
 
 class FuzzyParameter:
-    
+    '''This is a class to define a fuzzy parameter.'''
+
     def __init__(self, name: str, range: Tuple):
         self.name = name
         self.range = range
         self.sets = dict()
     
     def create_set(self, name: str, points: list) -> None:
-        '''Creates a fuzzyset with the given name and points.'''
+        '''Creates a fuzzyset with the given name and points to draw a line.'''
         if name in self.sets:
             raise ValueError('Set already exists')
         our_set = FuzzySet(name)
@@ -92,10 +93,12 @@ class FuzzyParameter:
         our_set.parameter = self
 
     def add_set(self, our_set: FuzzySet) -> None:
+        '''Adds a fuzzyset to the parameter.'''
         self.sets[our_set.name] = our_set
         our_set.parameter = self
     
     def plot(self) -> None:
+        '''Plots the parameter's fuzzysets.'''
         x = np.linspace(self.range[0], self.range[1], 1000)
         for set_name, set in self.sets.items():
             y = [set.get_value(_x) for _x in x]
@@ -105,6 +108,7 @@ class FuzzyParameter:
         plt.show()
     
     def get_value(self, x: float) -> dict:
+        '''Returns the value of the parameter at x for every fuzzysets.'''
         result = dict()
         for set_name, set in self.sets.items():
             result[set_name] = set.get_value(x)
@@ -118,7 +122,6 @@ age_param.create_set('young', [(AGE_RANGE[0], 1), (29, 1), (38, 0)])
 age_param.create_set('mild', [(33, 0), (38, 1), (45, 0)])
 age_param.create_set('old', [(40, 0), (48, 1), (58, 0)])
 age_param.create_set('veryold', [(52, 0), (60, 1), (AGE_RANGE[1], 1)])
-age_param.plot()
 
 # Define Blood pressure fuzzysets
 BP_RANGE = (0, 350)
@@ -128,14 +131,12 @@ blood_pressure_param.create_set('low', [(BP_RANGE[0], 1), (111, 1), (134, 0)])
 blood_pressure_param.create_set('medium', [(127, 0), (139, 1), (153, 0)])
 blood_pressure_param.create_set('high', [(153, 0), (157, 1), (172, 0)])
 blood_pressure_param.create_set('veryhigh', [(154, 0), (171, 1), (BP_RANGE[1], 1)])
-blood_pressure_param.plot()
 
 # Define Blood sugar fuzzysets
 BS_RANGE = (0, 200)
 
 blood_sugar_param = FuzzyParameter(name='bloodSugar', range=BS_RANGE)
 blood_sugar_param.create_set('low', [(105, 0), (120, 1), (BS_RANGE[1], 1)])
-blood_sugar_param.plot()
 
 # Define cholesterol fuzzysets
 CH_RANGE = (0, 600)
@@ -145,7 +146,6 @@ cholesterol_param.create_set('low', [(CH_RANGE[0], 1), (151, 1), (197, 0)])
 cholesterol_param.create_set('medium', [(188, 0), (215, 1), (250, 0)])
 cholesterol_param.create_set('high', [(217, 0), (263, 1), (307, 0)])
 cholesterol_param.create_set('veryhigh', [(281, 0), (347, 1), (CH_RANGE[1], 1)])
-cholesterol_param.plot()
 
 # Define heartrate fuzzysets
 HR_RANGE = (0, 600)
@@ -154,7 +154,7 @@ heartrate_param = FuzzyParameter(name='heartRate', range=HR_RANGE)
 heartrate_param.create_set('low', [(HR_RANGE[0], 1), (100, 1), (141, 0)])
 heartrate_param.create_set('medium', [(111, 0), (152, 1), (194, 0)])
 heartrate_param.create_set('high', [(152, 0), (210, 1), (HR_RANGE[1], 1)])
-heartrate_param.plot()
+
 # Define ecg fuzzysets
 ECG_RANGE = (-0.5, 2.5)
 
@@ -162,7 +162,6 @@ ecg_param = FuzzyParameter(name='ECG', range=ECG_RANGE)
 ecg_param.create_set('normal', [(ECG_RANGE[0], 1), (0, 1), (0.4, 0)])
 ecg_param.create_set('abnormal', [(0.2, 0), (1, 1), (1.8, 0)])
 ecg_param.create_set('hypertrophy', [(1.4, 0), (1.9, 1), (ECG_RANGE[1], 1)])
-ecg_param.plot()
 
 # Define old peak fuzzysets
 OP_RANGE = (0, 10)
@@ -171,4 +170,3 @@ oldpeak_param = FuzzyParameter(name='oldPeak', range=OP_RANGE)
 oldpeak_param.create_set('low', [(OP_RANGE[0], 1), (1, 1), (2, 0)])
 oldpeak_param.create_set('risk', [(1.5, 0), (2.8, 1), (4.2, 0)])
 oldpeak_param.create_set('terrible', [(2.5, 0), (4, 1), (OP_RANGE[1], 1)])
-oldpeak_param.plot()
