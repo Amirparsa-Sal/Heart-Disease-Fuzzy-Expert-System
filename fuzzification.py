@@ -42,19 +42,6 @@ class Line(FuzzySetSection):
         result = np.linalg.solve(weights, out)
         return result[0], result[1]
 
-class ConstantValue:
-    '''This is a class to define a constant value in a fuzzyset.'''
-    def __init__(self, start_x: float, end_x: float, value: float) -> None:
-        self.start_x = start_x
-        self.end_x = end_x
-        self.value = value
-    
-    def get_value(self, x: float) -> float:
-        return self.value
-    
-    def range(self) -> Tuple:
-        return self.start_x, self.end_x
-
 class FuzzySet:
     '''This is a class to define a fuzzyset.'''
     def __init__(self, name:str) -> None:
