@@ -12,9 +12,22 @@ class FuzzySetSection(ABC):
         pass
     
     @abstractmethod
-    def get_value(self, x: float) -> Tuple:
+    def get_value(self, x: float) -> float:
         '''Returns the value of the section at x.'''
         pass
+
+class Point(FuzzySetSection):
+    '''This is a class to define a point in a fuzzyset. this section can be a point.'''
+
+    def __init__(self, x: float, value: float):
+        self.x = x
+        self.value = value
+
+    def range(self) -> Tuple:
+        return (self.x, self.x)
+
+    def get_value(self, x: float) -> float:
+        return self.value
 
 class Line(FuzzySetSection):
     '''This is a class to define a line in a fuzzyset.'''
@@ -29,7 +42,7 @@ class Line(FuzzySetSection):
         # find the line parameters
         self.m, self.b = self.__find_line_paramaters(self.start_pos[0], self.start_pos[1], self.end_pos[0], self.end_pos[1])
 
-    def get_value(self, x: float) -> Tuple:
+    def get_value(self, x: float) -> float:
         return self.m * x + self.b
     
     def range(self) -> Tuple:
@@ -41,12 +54,17 @@ class Line(FuzzySetSection):
         result = np.linalg.solve(weights, out)
         return result[0], result[1]
 
+def linspace(start: float, end: float, stride: int) -> List:
+    '''Returns a list of floats between start and end with stride.'''
+    return [start + i * stride for i in range(int((end - start) / stride) + 1)]
+
 class FuzzySet:
     '''This is a class to define a fuzzyset.'''
     def __init__(self, name:str) -> None:
         self.name = name
         self.parameter = None
         self.sections = []
+        self.not_continous_points = []
 
     def add(self, section: FuzzySetSection) -> None:
         '''Adds a section to the fuzzyset.'''
@@ -54,6 +72,8 @@ class FuzzySet:
         for s in self.sections:
             if self.__has_interception(s.range(), section.range()):
                 raise ValueError('Interception between sections')
+        if isinstance(section, Point):
+            self.not_continous_points.append(section.x)
         self.sections.append(section)
     
     def get_value(self, x: float) -> float:
@@ -99,7 +119,7 @@ class FuzzyParameter:
     
     def plot(self) -> None:
         '''Plots the parameter's fuzzysets.'''
-        x = np.linspace(self.range[0], self.range[1], 1000)
+        x = linspace(self.range[0], self.range[1], 0.005)
         for set_name, set in self.sets.items():
             y = [set.get_value(_x) for _x in x]
             plt.plot(x, y, label=f'{self.name}_{set_name}')
@@ -113,9 +133,33 @@ class FuzzyParameter:
         for set_name, set in self.sets.items():
             result[set_name] = set.get_value(x)
         return result
+    
+    def __str__(self) -> str:
+        return f'{self.name}: sets: {len(self.sets)}'
 
 def init_fuzzy_parameters() -> List[FuzzyParameter]:
     '''Initializes the fuzzy parameters.'''
+
+    # define chest pain fuzzysets
+    CP_RANGE = (1, 4)
+    
+    chest_typical_anginal = FuzzySet('typical_anginal')
+    chest_typical_anginal.add(Point(1, 1))
+    
+    chest_atypical_anginal = FuzzySet('atypical_anginal')
+    chest_atypical_anginal.add(Point(2, 1))
+
+    chest_non_anginal = FuzzySet('non_aginal_pain')
+    chest_non_anginal.add(Point(3, 1))
+
+    chest_asymptomatic = FuzzySet('asymptomatic')
+    chest_asymptomatic.add(Point(4, 1))
+
+    chest_pain_param = FuzzyParameter('chestPain', CP_RANGE, name_in_rules='chest_pain')
+    chest_pain_param.add_set(chest_typical_anginal)
+    chest_pain_param.add_set(chest_atypical_anginal)
+    chest_pain_param.add_set(chest_non_anginal)
+    chest_pain_param.add_set(chest_asymptomatic)
 
     # Define age fuzzysets
     AGE_RANGE = (0, 100)
@@ -158,6 +202,50 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     heartrate_param.create_set('medium', [(111, 0), (152, 1), (194, 0)])
     heartrate_param.create_set('high', [(152, 0), (210, 1), (HR_RANGE[1], 1)])
 
+    # Define exercise fuzzysets
+    CP_RANGE = (0, 1)
+    
+    exercise_false = FuzzySet('false')
+    exercise_false.add(Point(0, 1))
+
+    exercise_true = FuzzySet('true')
+    exercise_true.add(Point(1, 1))
+
+    exercise_param = FuzzyParameter('exercise', CP_RANGE)
+    exercise_param.add_set(exercise_false)
+    exercise_param.add_set(exercise_true)
+
+    # Define thallium fuzzysets
+    T_RANGE = (3, 7)
+    thallium_normal = FuzzySet('normal')
+    thallium_normal.add(Point(3, 1))
+
+    thallium_medium = FuzzySet('medium')
+    thallium_medium.add(Point(6, 1))
+
+    thallium_high = FuzzySet('high')
+    thallium_high.add(Point(7, 1))
+
+    thallium_param = FuzzyParameter('thallium', T_RANGE)
+    thallium_param.add_set(thallium_normal)
+    thallium_param.add_set(thallium_medium)
+    thallium_param.add_set(thallium_high)
+    print(thallium_param.get_value(6))
+    thallium_param.plot()
+
+    # Define sex fuzzysets
+    SEX_RANGE = (0, 1)
+
+    sex_male = FuzzySet('male')
+    sex_male.add(Point(0, 1))
+
+    sex_female = FuzzySet('female')
+    sex_female.add(Point(1, 1))
+
+    sex_param = FuzzyParameter('sex', SEX_RANGE)
+    sex_param.add_set(sex_male)
+    sex_param.add_set(sex_female)
+
     # Define ecg fuzzysets
     ECG_RANGE = (-0.5, 2.5)
 
@@ -174,5 +262,9 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     oldpeak_param.create_set('risk', [(1.5, 0), (2.8, 1), (4.2, 0)])
     oldpeak_param.create_set('terrible', [(2.5, 0), (4, 1), (OP_RANGE[1], 1)])
 
-    return [age_param, blood_pressure_param, blood_sugar_param, cholesterol_param,
-           heartrate_param, ecg_param, oldpeak_param]
+    return [chest_pain_param, blood_pressure_param, cholesterol_param, blood_sugar_param,
+           ecg_param, heartrate_param, exercise_param, oldpeak_param, thallium_param, age_param]
+
+params = init_fuzzy_parameters()
+for param in params:
+    param.plot()
