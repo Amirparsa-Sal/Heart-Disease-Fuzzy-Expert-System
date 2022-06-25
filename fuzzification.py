@@ -265,6 +265,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     return [chest_pain_param, blood_pressure_param, cholesterol_param, blood_sugar_param,
            ecg_param, heartrate_param, exercise_param, oldpeak_param, thallium_param, age_param]
 
-params = init_fuzzy_parameters()
-for param in params:
-    param.plot()
+if __name__ == '__main__':
+    params = init_fuzzy_parameters()
+    for param in params:
+        param.plot()
