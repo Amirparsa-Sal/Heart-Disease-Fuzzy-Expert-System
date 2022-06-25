@@ -76,8 +76,9 @@ class FuzzySet:
 class FuzzyParameter:
     '''This is a class to define a fuzzy parameter.'''
 
-    def __init__(self, name: str, range: Tuple):
+    def __init__(self, name: str, range: Tuple, name_in_rules=None):
         self.name = name
+        self.name_in_rules = name_in_rules if name_in_rules else self.name
         self.range = range
         self.sets = dict()
     
@@ -128,7 +129,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     # Define Blood pressure fuzzysets
     BP_RANGE = (0, 350)
 
-    blood_pressure_param = FuzzyParameter(name='bloodPressure', range=BP_RANGE)
+    blood_pressure_param = FuzzyParameter(name='bloodPressure', range=BP_RANGE, name_in_rules='blood_pressure')
     blood_pressure_param.create_set('low', [(BP_RANGE[0], 1), (111, 1), (134, 0)])
     blood_pressure_param.create_set('medium', [(127, 0), (139, 1), (153, 0)])
     blood_pressure_param.create_set('high', [(153, 0), (157, 1), (172, 0)])
@@ -137,7 +138,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     # Define Blood sugar fuzzysets
     BS_RANGE = (0, 200)
 
-    blood_sugar_param = FuzzyParameter(name='bloodSugar', range=BS_RANGE)
+    blood_sugar_param = FuzzyParameter(name='bloodSugar', range=BS_RANGE, name_in_rules='blood_sugar')
     blood_sugar_param.create_set('low', [(105, 0), (120, 1), (BS_RANGE[1], 1)])
 
     # Define cholesterol fuzzysets
@@ -152,7 +153,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     # Define heartrate fuzzysets
     HR_RANGE = (0, 600)
 
-    heartrate_param = FuzzyParameter(name='heartRate', range=HR_RANGE)
+    heartrate_param = FuzzyParameter(name='heartRate', range=HR_RANGE, name_in_rules='maximum_heart_rate')
     heartrate_param.create_set('low', [(HR_RANGE[0], 1), (100, 1), (141, 0)])
     heartrate_param.create_set('medium', [(111, 0), (152, 1), (194, 0)])
     heartrate_param.create_set('high', [(152, 0), (210, 1), (HR_RANGE[1], 1)])
@@ -168,7 +169,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     # Define old peak fuzzysets
     OP_RANGE = (0, 10)
 
-    oldpeak_param = FuzzyParameter(name='oldPeak', range=OP_RANGE)
+    oldpeak_param = FuzzyParameter(name='oldPeak', range=OP_RANGE, name_in_rules='old_peak')
     oldpeak_param.create_set('low', [(OP_RANGE[0], 1), (1, 1), (2, 0)])
     oldpeak_param.create_set('risk', [(1.5, 0), (2.8, 1), (4.2, 0)])
     oldpeak_param.create_set('terrible', [(2.5, 0), (4, 1), (OP_RANGE[1], 1)])
