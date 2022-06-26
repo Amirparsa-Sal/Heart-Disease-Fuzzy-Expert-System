@@ -16,7 +16,7 @@ class DefuzzificationMethod(ABC):
         '''Defuzzify the data.'''
         pass
     
-class CenterOfMassDefuz(DefuzzificationMethod):
+class CenterOfMassDefuz(DefuzzificationMethod): 
     '''A class to calculate the center of mass of the output fuzzysets.'''
 
     def __init__(self, stride, range) -> None:
@@ -27,10 +27,12 @@ class CenterOfMassDefuz(DefuzzificationMethod):
     def defuzzify(self, data: List[FuzzySetDefuzData]) -> float:
         '''Defuzzify the data.'''
         total_area = 0
+        total_membership = 0
         for i in [self.range[0] + i * self.stride for i in range(int((self.range[1] - self.range[0]) / self.stride) + 1)]:
             max_value = float('-inf')
             for fuzzy_set_data in data:
                 value = fuzzy_set_data.fuzzy_set.get_cut_value(i, fuzzy_set_data.cut_value)
                 max_value = max(max_value, value)
-            total_area += max_value * self.stride
-        return total_area
+            total_area += max_value * i
+            total_membership += max_value
+        return total_area / total_membership
