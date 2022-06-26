@@ -1,3 +1,6 @@
+from unittest import result
+from inference import FuzzyIntelligentSystem
+
 class ProvideResult(object):
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -6,4 +9,6 @@ class ProvideResult(object):
 
     @staticmethod
     def get_final_result(input_dict: dict) -> str:
-        pass
+        fs = FuzzyIntelligentSystem()
+        result = fs.calculate_result(input_dict)
+        return str(result)
