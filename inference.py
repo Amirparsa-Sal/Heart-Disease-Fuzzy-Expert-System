@@ -133,7 +133,7 @@ class FuzzyIntelligentSystem:
         defuz_data = [FuzzySetDefuzData(self.output_param.sets[key], max_values[key]) for key in max_values.keys()]
         # calculate the output value
         defuzz = CenterOfMassDefuz(stride=0.001, range=self.output_param.range)
-        return defuzz.defuzzify(defuz_data), max_values
+        return defuzz.defuzzify(defuz_data)
 
     def get_health_status(self, value: float) -> str:
         status = ""
