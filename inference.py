@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Tuple, List
 from dataclasses import dataclass
 from rule_parser import RuleParser
+from defuzzification import CenterOfMassDefuz, FuzzySetDefuzData
 
 class FuzzyOperator(ABC):
     '''An abstract class to represent a fuzzy operator'''
@@ -122,4 +123,9 @@ class FuzzyIntelligentSystem:
             # update the max value of the output fuzzy set if the result is greater than the current max value
             if result_value > max_values[rule.then_clause_item.fuzzyset_name]:
                 max_values[rule.then_clause_item.fuzzyset_name] = result_value
-        return max_values
+
+        # create deffuzification data
+        defuz_data = [FuzzySetDefuzData(self.output_param.sets[key], max_values[key]) for key in max_values.keys()]
+        # calculate the output value
+        defuzz = CenterOfMassDefuz(stride=0.01, range=self.output_param.range)
+        return defuzz.defuzzify(defuz_data)
