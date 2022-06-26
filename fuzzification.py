@@ -64,7 +64,6 @@ class FuzzySet:
         self.name = name
         self.parameter = None
         self.sections = []
-        self.not_continous_points = []
 
     def add(self, section: FuzzySetSection) -> None:
         '''Adds a section to the fuzzyset.'''
@@ -72,8 +71,6 @@ class FuzzySet:
         for s in self.sections:
             if self.__has_interception(s.range(), section.range()):
                 raise ValueError('Interception between sections')
-        if isinstance(section, Point):
-            self.not_continous_points.append(section.x)
         self.sections.append(section)
     
     def get_value(self, x: float) -> float:
@@ -120,12 +117,14 @@ class FuzzyParameter:
         self.sets[our_set.name] = our_set
         our_set.parameter = self
     
-    def plot(self) -> None:
+    def plot(self, cut_values: dict = None) -> None:
         '''Plots the parameter's fuzzysets.'''
         x = linspace(self.range[0], self.range[1], 0.005)
         for set_name, set in self.sets.items():
-            y = [set.get_value(_x) for _x in x]
+            y = [set.get_cut_value(x_, cut_values[set_name]) for x_ in x] if set_name in cut_values \
+                else [set.get_value(_x) for _x in x]
             plt.plot(x, y, label=f'{self.name}_{set_name}')
+        plt.xlim(self.range[0], self.range[1])
         plt.legend(loc='best')
         plt.title(f'{self.name}')
         plt.show()
@@ -272,7 +271,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
 
 def init_output_fuzzy_sets():
     # Define output fuzzysets
-    output_param = FuzzyParameter(name='health', range=(0, 1))
+    output_param = FuzzyParameter(name='health', range=(0, 4))
     output_param.create_set('sick_1', [(0, 1), (0.25, 1), (1, 0)])
     output_param.create_set('sick_2', [(0, 0), (1, 1), (2,0)])
     output_param.create_set('sick_3', [(1, 0), (2, 1), (3,0)])
