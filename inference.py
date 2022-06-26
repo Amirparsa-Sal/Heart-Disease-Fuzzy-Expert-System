@@ -98,7 +98,7 @@ class FuzzyIntelligentSystem:
                 if term.parameter_name in self.fuzzy_parameters:
                     # if the parameter is in the fuzzy system, calculate the fuzzy value
                     result_value = self.fuzzy_parameters[term.parameter_name].get_value_in_set(
-                        int(input_dict[term.parameter_name]), term.fuzzyset_name)
+                        float(input_dict[term.parameter_name]), term.fuzzyset_name)
                 else:
                     raise ValueError(f'Parameter {term.parameter_name} is not in fuzzy parameters')
             else:
@@ -124,6 +124,8 @@ class FuzzyIntelligentSystem:
             if result_value > max_values[rule.then_clause_item.fuzzyset_name]:
                 max_values[rule.then_clause_item.fuzzyset_name] = result_value
 
+        print(max_values)
+        self.output_param.plot(cut_values=max_values)
         # create deffuzification data
         defuz_data = [FuzzySetDefuzData(self.output_param.sets[key], max_values[key]) for key in max_values.keys()]
         # calculate the output value
