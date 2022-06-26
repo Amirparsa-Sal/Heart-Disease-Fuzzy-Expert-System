@@ -87,6 +87,9 @@ class FuzzySet:
             if section.range()[0] <= x <= section.range()[1]:
                 return section.get_value(x)
         return 0
+    
+    def get_cut_value(self, x: float, cut: float):
+        return min(cut, self.get_value(x))
 
     def __has_interception(self, range1: Tuple, range2: Tuple) -> bool:
         if range2[0] < range1[1] < range2[1] or range1[0] < range2[1] < range1[1]:
@@ -101,7 +104,7 @@ class FuzzyParameter:
         self.name_in_rules = name_in_rules if name_in_rules else self.name
         self.range = range
         self.sets = dict()
-    
+
     def create_set(self, name: str, points: list) -> None:
         '''Creates a fuzzyset with the given name and points to draw a line.'''
         if name in self.sets:
