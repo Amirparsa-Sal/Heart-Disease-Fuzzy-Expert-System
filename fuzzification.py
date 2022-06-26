@@ -189,7 +189,8 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     BS_RANGE = (0, 200)
 
     blood_sugar_param = FuzzyParameter(name='bloodSugar', range=BS_RANGE, name_in_rules='blood_sugar')
-    blood_sugar_param.create_set('low', [(105, 0), (120, 1), (BS_RANGE[1], 1)])
+    blood_sugar_param.create_set('false', [(BS_RANGE[0], 1), (105, 1), (120, 0)])
+    blood_sugar_param.create_set('true', [(105, 0), (120, 1), (BS_RANGE[1], 1)])
 
     # Define cholesterol fuzzysets
     CH_RANGE = (0, 600)
@@ -272,11 +273,11 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
 def init_output_fuzzy_sets():
     # Define output fuzzysets
     output_param = FuzzyParameter(name='health', range=(0, 4))
-    output_param.create_set('sick_1', [(0, 1), (0.25, 1), (1, 0)])
-    output_param.create_set('sick_2', [(0, 0), (1, 1), (2,0)])
-    output_param.create_set('sick_3', [(1, 0), (2, 1), (3,0)])
-    output_param.create_set('sick_4', [(2, 0), (3, 1), (4,0)])
-    output_param.create_set('healthy', [(3, 0), (3.75, 1), (4, 1)])
+    output_param.create_set('healthy', [(0, 1), (0.25, 1), (1, 0)])
+    output_param.create_set('sick_1', [(0, 0), (1, 1), (2,0)])
+    output_param.create_set('sick_2', [(1, 0), (2, 1), (3,0)])
+    output_param.create_set('sick_3', [(2, 0), (3, 1), (4,0)])
+    output_param.create_set('sick_4', [(3, 0), (3.75, 1), (4, 1)])
     return output_param
 
 if __name__ == '__main__':
