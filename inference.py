@@ -99,6 +99,7 @@ class FuzzyIntelligentSystem:
                     # if the parameter is in the fuzzy system, calculate the fuzzy value
                     result_value = self.fuzzy_parameters[term.parameter_name].get_value_in_set(
                         float(input_dict[term.parameter_name]), term.fuzzyset_name)
+                    print(f'({term.parameter_name} {term.fuzzyset_name} {result_value}) ', end='')
                 else:
                     raise ValueError(f'Parameter {term.parameter_name} is not in fuzzy parameters')
             else:
@@ -113,6 +114,7 @@ class FuzzyIntelligentSystem:
                         # if the parameter is in the fuzzy system, calculate the fuzzy value
                         term_value = self.fuzzy_parameters[term.parameter_name].get_value_in_set(
                             int(input_dict[term.parameter_name]), term.fuzzyset_name)
+                        print(f'({term.parameter_name} {term.fuzzyset_name} {term_value}) ', end='')
                         # update the result value using the fuzzy operator
                         result_value = rule.operator.get_fuzzy_value(result_value, term_value)
                     else:
@@ -120,14 +122,15 @@ class FuzzyIntelligentSystem:
                 else:
                     raise ValueError(f'Parameter {term.parameter_name} is not in input dict')
 
+            print(f'=> ({rule.then_clause_item.fuzzyset_name} {result_value})')
             # update the max value of the output fuzzy set if the result is greater than the current max value
             if result_value > max_values[rule.then_clause_item.fuzzyset_name]:
                 max_values[rule.then_clause_item.fuzzyset_name] = result_value
 
         print(max_values)
-        self.output_param.plot(cut_values=max_values)
+        # self.output_param.plot(cut_values=max_values)
         # create deffuzification data
         defuz_data = [FuzzySetDefuzData(self.output_param.sets[key], max_values[key]) for key in max_values.keys()]
         # calculate the output value
-        defuzz = CenterOfMassDefuz(stride=0.01, range=self.output_param.range)
+        defuzz = CenterOfMassDefuz(stride=0.001, range=self.output_param.range)
         return defuzz.defuzzify(defuz_data)
