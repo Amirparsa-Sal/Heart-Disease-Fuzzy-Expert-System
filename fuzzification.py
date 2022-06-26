@@ -172,7 +172,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     age_param.create_set('young', [(AGE_RANGE[0], 1), (29, 1), (38, 0)])
     age_param.create_set('mild', [(33, 0), (38, 1), (45, 0)])
     age_param.create_set('old', [(40, 0), (48, 1), (58, 0)])
-    age_param.create_set('veryold', [(52, 0), (60, 1), (AGE_RANGE[1], 1)])
+    age_param.create_set('very_old', [(52, 0), (60, 1), (AGE_RANGE[1], 1)])
 
     # Define Blood pressure fuzzysets
     BP_RANGE = (0, 350)
@@ -181,7 +181,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     blood_pressure_param.create_set('low', [(BP_RANGE[0], 1), (111, 1), (134, 0)])
     blood_pressure_param.create_set('medium', [(127, 0), (139, 1), (153, 0)])
     blood_pressure_param.create_set('high', [(153, 0), (157, 1), (172, 0)])
-    blood_pressure_param.create_set('veryhigh', [(154, 0), (171, 1), (BP_RANGE[1], 1)])
+    blood_pressure_param.create_set('very_high', [(154, 0), (171, 1), (BP_RANGE[1], 1)])
 
     # Define Blood sugar fuzzysets
     BS_RANGE = (0, 200)
@@ -196,7 +196,7 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     cholesterol_param.create_set('low', [(CH_RANGE[0], 1), (151, 1), (197, 0)])
     cholesterol_param.create_set('medium', [(188, 0), (215, 1), (250, 0)])
     cholesterol_param.create_set('high', [(217, 0), (263, 1), (307, 0)])
-    cholesterol_param.create_set('veryhigh', [(281, 0), (347, 1), (CH_RANGE[1], 1)])
+    cholesterol_param.create_set('very_high', [(281, 0), (347, 1), (CH_RANGE[1], 1)])
 
     # Define heartrate fuzzysets
     HR_RANGE = (0, 600)
@@ -234,8 +234,6 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     thallium_param.add_set(thallium_normal)
     thallium_param.add_set(thallium_medium)
     thallium_param.add_set(thallium_high)
-    print(thallium_param.get_value(6))
-    thallium_param.plot()
 
     # Define sex fuzzysets
     SEX_RANGE = (0, 1)
@@ -267,15 +265,15 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     oldpeak_param.create_set('terrible', [(2.5, 0), (4, 1), (OP_RANGE[1], 1)])
 
     return [chest_pain_param, blood_pressure_param, cholesterol_param, blood_sugar_param,
-           ecg_param, heartrate_param, exercise_param, oldpeak_param, thallium_param, age_param]
+           ecg_param, heartrate_param, exercise_param, oldpeak_param, thallium_param, sex_param, age_param]
 
 def init_output_fuzzy_sets():
     # Define output fuzzysets
-    output_param = FuzzyParameter(name='output', range=(0, 1))
-    output_param.create_set('sick1', [(0, 1), (0.25, 1), (1, 0)])
-    output_param.create_set('sick2', [(0, 0), (1, 1), (2,0)])
-    output_param.create_set('sick3', [(1, 0), (2, 1), (3,0)])
-    output_param.create_set('sick4', [(2, 0), (3, 1), (4,0)])
+    output_param = FuzzyParameter(name='health', range=(0, 1))
+    output_param.create_set('sick_1', [(0, 1), (0.25, 1), (1, 0)])
+    output_param.create_set('sick_2', [(0, 0), (1, 1), (2,0)])
+    output_param.create_set('sick_3', [(1, 0), (2, 1), (3,0)])
+    output_param.create_set('sick_4', [(2, 0), (3, 1), (4,0)])
     output_param.create_set('healthy', [(3, 0), (3.75, 1), (4, 1)])
     return output_param
 
