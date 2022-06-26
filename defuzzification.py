@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from abc import abstractmethod, ABC
-from typing import Tuple, List
+from typing import List
+from fuzzification import FuzzySet
 
 @dataclass
 class FuzzySetDefuzData:
-    membership_function: callable
-    range: Tuple[float, float]
+    fuzzy_set: FuzzySet
+    cut_value: float
 
 class DefuzzificationMethod(ABC):
     '''An abstract class to represent a defuzzification method.'''
@@ -26,10 +27,10 @@ class CenterOfMassDefuz(DefuzzificationMethod):
     def defuzzify(self, data: List[FuzzySetDefuzData]) -> float:
         '''Defuzzify the data.'''
         total_area = 0
-        for i in range(self.range[0], self.range[1], self.stride):
+        for i in [self.range[0] + i * self.stride for i in range(int((self.range[1] - self.range[0]) / self.stride) + 1)]:
             max_value = float('-inf')
             for fuzzy_set_data in data:
-                if fuzzy_set_data.range[0] <= i <= fuzzy_set_data.range[1] and fuzzy_set_data.membership_function(i) > max_value:
-                    max_value = fuzzy_set_data.membership_function(i)
+                value = fuzzy_set_data.fuzzy_set.get_cut_value(i, fuzzy_set_data.cut_value)
+                max_value = max(max_value, value)
             total_area += max_value * self.stride
         return total_area
