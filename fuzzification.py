@@ -27,7 +27,9 @@ class Point(FuzzySetSection):
         return (self.x, self.x)
 
     def get_value(self, x: float) -> float:
-        return self.value
+        if x == self.x:
+            return self.value
+        return 0
 
 class Line(FuzzySetSection):
     '''This is a class to define a line in a fuzzyset.'''
