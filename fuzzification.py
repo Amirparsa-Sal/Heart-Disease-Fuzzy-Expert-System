@@ -123,10 +123,10 @@ class FuzzyParameter:
         '''Plots the parameter's fuzzysets.'''
         x = linspace(self.range[0], self.range[1], 0.005)
         for set_name, set in self.sets.items():
-            y = [set.get_cut_value(x_, cut_values[set_name]) for x_ in x] if set_name in cut_values \
-                else [set.get_value(_x) for _x in x]
+            y = [set.get_value(_x) for _x in x] if (cut_values is None or set_name not in cut_values) \
+                else [set.get_cut_value(x_, cut_values[set_name]) for x_ in x]
             plt.plot(x, y, label=f'{self.name}_{set_name}')
-        plt.xlim(self.range[0], self.range[1])
+        plt.xlim(self.range[0] - 0.1, self.range[1] + 0.1)
         plt.legend(loc='best')
         plt.title(f'{self.name}')
         plt.show()
@@ -269,8 +269,10 @@ def init_fuzzy_parameters() -> List[FuzzyParameter]:
     oldpeak_param.create_set('risk', [(1.5, 0), (2.8, 1), (4.2, 0)])
     oldpeak_param.create_set('terrible', [(2.5, 0), (4, 1), (OP_RANGE[1], 1)])
 
-    return [chest_pain_param, blood_pressure_param, cholesterol_param, blood_sugar_param,
+    params = [chest_pain_param, blood_pressure_param, cholesterol_param, blood_sugar_param, \
            ecg_param, heartrate_param, exercise_param, oldpeak_param, thallium_param, sex_param, age_param]
+
+    return params
 
 def init_output_fuzzy_sets():
     # Define output fuzzysets
