@@ -19,7 +19,7 @@ Localhost:8448
   
   Age of the patient in range of [0,100]
   
-  ![]()
+  ![](https://github.com/Amirparsa-Sal/Heart-Disease-Fuzzy-Intelligent-System/blob/master/fuzzysets/age.png)
 
 - ### Blood Pressure
   
