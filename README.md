@@ -1,4 +1,4 @@
-# Heart Disease Fuzzy Intelligent System
+# Heart Disease Fuzzy Expert System
 
 This is one of my final projects in the "Computational Intelligence" course at AUT. In this project, I've implemented a fuzzy intelligent system that can decide whether a person has a heart problem or not and at what grade is the problem.
 
